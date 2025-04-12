@@ -1,0 +1,17 @@
+{
+  "name": "Scrim-s06gjpd",
+  "description": "https://scrimba.com/frontend-path-c0j/~0qx/s06q2ohgoo/head",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7"
+  }
+}

@@ -29,8 +29,7 @@ onAuthStateChanged(auth, (user) => {
     initializeLeadsTracker(user)
 });
 
-function initializeLeadsTracker(user) {
-    
+function initializeLeadsTracker(user) {    
     const userRef = ref(database, `users/${user.email}/leads`)
 
     deleteBtn.addEventListener("dblclick", function() {
@@ -43,7 +42,7 @@ function initializeLeadsTracker(user) {
             
             push(userRef, inputEl.value);
             inputEl.value = "";
-            // render(userRef)  
+              
     })
     
     onValue(userRef, function(snapshot) {

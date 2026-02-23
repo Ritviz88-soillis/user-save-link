@@ -2,8 +2,5 @@
   command = "npm run build"
   publish = "dist"
 
-# Redirect all routes to index.html for SPA behavior
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Don't redirect actual HTML files - let them be served directly
+# Only redirect unknown routes to index.html for SPA behavior

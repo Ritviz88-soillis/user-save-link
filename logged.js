@@ -36,96 +36,112 @@ let searchQuery = ''
 let viewMode = 'grid'
 
 // ============================================
-// DOM Elements
+// DOM Elements - Initialize after DOM ready
 // ============================================
-const elements = {
-    // Sidebar
-    sidebar: document.getElementById('sidebar'),
-    sidebarToggle: document.getElementById('sidebar-toggle'),
-    userInfo: document.getElementById('user-info'),
-    userAvatar: document.getElementById('user-avatar'),
-    userName: document.getElementById('user-name'),
-    userEmail: document.getElementById('user-email'),
-    logoutBtn: document.getElementById('logout-btn'),
-    foldersList: document.getElementById('folders-list'),
-    addFolderBtn: document.getElementById('add-folder-btn'),
+let elements = {}
+
+function initElements() {
+    elements = {
+        // Sidebar
+        sidebar: document.getElementById('sidebar'),
+        sidebarToggle: document.getElementById('sidebar-toggle'),
+        userInfo: document.getElementById('user-info'),
+        userAvatar: document.getElementById('user-avatar'),
+        userName: document.getElementById('user-name'),
+        userEmail: document.getElementById('user-email'),
+        logoutBtn: document.getElementById('logout-btn'),
+        foldersList: document.getElementById('folders-list'),
+        addFolderBtn: document.getElementById('add-folder-btn'),
+        
+        // Counts
+        countAll: document.getElementById('count-all'),
+        countFavorites: document.getElementById('count-favorites'),
+        countRecent: document.getElementById('count-recent'),
+        
+        // Top bar
+        searchInput: document.getElementById('search-input'),
+        clearSearch: document.getElementById('clear-search'),
+        exportBtn: document.getElementById('export-btn'),
+        viewToggle: document.getElementById('view-toggle'),
+        viewIcon: document.getElementById('view-icon'),
+        
+        // Add link form
+        addLinkForm: document.getElementById('add-link-form'),
+        inputEl: document.getElementById('input-el'),
+        linkTitle: document.getElementById('link-title'),
+        linkFolder: document.getElementById('link-folder'),
+        linkTags: document.getElementById('link-tags'),
+        linkNotes: document.getElementById('link-notes'),
+        toggleAdvanced: document.getElementById('toggle-advanced'),
+        advancedOptions: document.getElementById('advanced-options'),
+        
+        // Links display
+        sectionTitle: document.getElementById('section-title'),
+        sortSelect: document.getElementById('sort-select'),
+        deleteBtn: document.getElementById('delete-btn'),
+        linksContainer: document.getElementById('links-container'),
+        emptyState: document.getElementById('empty-state'),
+        loadingState: document.getElementById('loading-state'),
+        
+        // Theme
+        themeToggle: document.getElementById('theme-toggle'),
+        
+        // Modals
+        folderModal: document.getElementById('folder-modal'),
+        folderForm: document.getElementById('folder-form'),
+        folderName: document.getElementById('folder-name'),
+        iconPicker: document.getElementById('icon-picker'),
+        
+        editModal: document.getElementById('edit-modal'),
+        editForm: document.getElementById('edit-form'),
+        editLinkId: document.getElementById('edit-link-id'),
+        editUrl: document.getElementById('edit-url'),
+        editTitle: document.getElementById('edit-title'),
+        editFolder: document.getElementById('edit-folder'),
+        editTags: document.getElementById('edit-tags'),
+        editNotes: document.getElementById('edit-notes'),
+        
+        // Toast
+        toastContainer: document.getElementById('toast-container')
+    }
     
-    // Counts
-    countAll: document.getElementById('count-all'),
-    countFavorites: document.getElementById('count-favorites'),
-    countRecent: document.getElementById('count-recent'),
-    
-    // Top bar
-    searchInput: document.getElementById('search-input'),
-    clearSearch: document.getElementById('clear-search'),
-    exportBtn: document.getElementById('export-btn'),
-    viewToggle: document.getElementById('view-toggle'),
-    viewIcon: document.getElementById('view-icon'),
-    
-    // Add link form
-    addLinkForm: document.getElementById('add-link-form'),
-    inputEl: document.getElementById('input-el'),
-    linkTitle: document.getElementById('link-title'),
-    linkFolder: document.getElementById('link-folder'),
-    linkTags: document.getElementById('link-tags'),
-    linkNotes: document.getElementById('link-notes'),
-    toggleAdvanced: document.getElementById('toggle-advanced'),
-    advancedOptions: document.getElementById('advanced-options'),
-    
-    // Links display
-    sectionTitle: document.getElementById('section-title'),
-    sortSelect: document.getElementById('sort-select'),
-    deleteBtn: document.getElementById('delete-btn'),
-    linksContainer: document.getElementById('links-container'),
-    emptyState: document.getElementById('empty-state'),
-    loadingState: document.getElementById('loading-state'),
-    
-    // Theme
-    themeToggle: document.getElementById('theme-toggle'),
-    
-    // Modals
-    folderModal: document.getElementById('folder-modal'),
-    folderForm: document.getElementById('folder-form'),
-    folderName: document.getElementById('folder-name'),
-    iconPicker: document.getElementById('icon-picker'),
-    
-    editModal: document.getElementById('edit-modal'),
-    editForm: document.getElementById('edit-form'),
-    editLinkId: document.getElementById('edit-link-id'),
-    editUrl: document.getElementById('edit-url'),
-    editTitle: document.getElementById('edit-title'),
-    editFolder: document.getElementById('edit-folder'),
-    editTags: document.getElementById('edit-tags'),
-    editNotes: document.getElementById('edit-notes'),
-    
-    // Toast
-    toastContainer: document.getElementById('toast-container')
+    console.log('DOM Elements initialized:', {
+        sidebar: !!elements.sidebar,
+        themeToggle: !!elements.themeToggle,
+        addLinkForm: !!elements.addLinkForm,
+        linksContainer: !!elements.linksContainer
+    })
 }
 
 // ============================================
 // Authentication
 // ============================================
-if (auth) {
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            console.log("No user logged in, redirecting to login page")
-            window.location.replace("index.html")
-            return
-        }
-        
-        currentUser = user
-        console.log("User is logged in:", user.email)
-        initializeAppUI(user)
-    })
-} else {
-    console.error('Auth not initialized, cannot check user state')
+function startAuthListener() {
+    if (auth) {
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                console.log("No user logged in, redirecting to login page")
+                window.location.replace("index.html")
+                return
+            }
+            
+            currentUser = user
+            console.log("User is logged in:", user.email)
+            initializeAppUI(user)
+        })
+    } else {
+        console.error('Auth not initialized, cannot check user state')
+    }
 }
 
 function initializeAppUI(user) {
+    // Initialize DOM elements first
+    initElements()
+    
     // Update user info
-    elements.userName.textContent = user.displayName || 'User'
-    elements.userEmail.textContent = user.email
-    elements.userAvatar.textContent = (user.displayName || user.email)[0].toUpperCase()
+    if (elements.userName) elements.userName.textContent = user.displayName || 'User'
+    if (elements.userEmail) elements.userEmail.textContent = user.email
+    if (elements.userAvatar) elements.userAvatar.textContent = (user.displayName || user.email)[0].toUpperCase()
     
     // Initialize theme
     initTheme()
@@ -164,8 +180,11 @@ function toggleTheme() {
 }
 
 function updateThemeIcon(theme) {
+    if (!elements.themeToggle) return
     const icon = elements.themeToggle.querySelector('.theme-icon')
-    icon.textContent = theme === 'dark' ? '☀️' : '🌙'
+    if (icon) {
+        icon.textContent = theme === 'dark' ? '☀️' : '🌙'
+    }
 }
 
 // ============================================
@@ -723,22 +742,26 @@ function escapeHtml(text) {
 // ============================================
 function setupEventListeners() {
     // Logout
-    elements.logoutBtn.addEventListener('click', async () => {
-        try {
-            await signOut(auth)
-            window.location.replace('index.html')
-        } catch (error) {
-            console.error('Logout error:', error)
-            showToast('Failed to logout', 'error')
-        }
-    })
+    if (elements.logoutBtn) {
+        elements.logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth)
+                window.location.replace('index.html')
+            } catch (error) {
+                console.error('Logout error:', error)
+                showToast('Failed to logout', 'error')
+            }
+        })
+    }
     
     // Theme toggle
-    elements.themeToggle.addEventListener('click', toggleTheme)
+    if (elements.themeToggle) {
+        elements.themeToggle.addEventListener('click', toggleTheme)
+    }
     
     // Sidebar toggle (mobile)
     elements.sidebarToggle?.addEventListener('click', () => {
-        elements.sidebar.classList.toggle('open')
+        elements.sidebar?.classList.toggle('open')
     })
     
     // Quick access filters
@@ -747,49 +770,69 @@ function setupEventListeners() {
     })
     
     // Add link form
-    elements.addLinkForm.addEventListener('submit', addLink)
+    if (elements.addLinkForm) {
+        elements.addLinkForm.addEventListener('submit', addLink)
+    }
     
     // Toggle advanced options
-    elements.toggleAdvanced.addEventListener('click', () => {
-        elements.advancedOptions.classList.toggle('visible')
-        elements.toggleAdvanced.classList.toggle('active')
-    })
+    if (elements.toggleAdvanced && elements.advancedOptions) {
+        elements.toggleAdvanced.addEventListener('click', () => {
+            elements.advancedOptions.classList.toggle('visible')
+            elements.toggleAdvanced.classList.toggle('active')
+        })
+    }
     
     // Search
-    elements.searchInput.addEventListener('input', (e) => {
-        searchQuery = e.target.value
-        elements.clearSearch.classList.toggle('visible', searchQuery.length > 0)
-        renderLinks()
-    })
+    if (elements.searchInput) {
+        elements.searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value
+            elements.clearSearch?.classList.toggle('visible', searchQuery.length > 0)
+            renderLinks()
+        })
+    }
     
-    elements.clearSearch.addEventListener('click', () => {
-        elements.searchInput.value = ''
-        searchQuery = ''
-        elements.clearSearch.classList.remove('visible')
-        renderLinks()
-    })
+    if (elements.clearSearch) {
+        elements.clearSearch.addEventListener('click', () => {
+            elements.searchInput.value = ''
+            searchQuery = ''
+            elements.clearSearch.classList.remove('visible')
+            renderLinks()
+        })
+    }
     
     // Sort
-    elements.sortSelect.addEventListener('change', (e) => {
-        currentSort = e.target.value
-        renderLinks()
-    })
+    if (elements.sortSelect) {
+        elements.sortSelect.addEventListener('change', (e) => {
+            currentSort = e.target.value
+            renderLinks()
+        })
+    }
     
     // Delete all (double click)
-    elements.deleteBtn.addEventListener('dblclick', deleteAllLinks)
+    if (elements.deleteBtn) {
+        elements.deleteBtn.addEventListener('dblclick', deleteAllLinks)
+    }
     
     // View toggle
-    elements.viewToggle.addEventListener('click', toggleView)
+    if (elements.viewToggle) {
+        elements.viewToggle.addEventListener('click', toggleView)
+    }
     
     // Export
-    elements.exportBtn.addEventListener('click', exportLinks)
+    if (elements.exportBtn) {
+        elements.exportBtn.addEventListener('click', exportLinks)
+    }
     
     // Add folder modal
-    elements.addFolderBtn.addEventListener('click', () => {
-        elements.folderModal.classList.add('visible')
-    })
+    if (elements.addFolderBtn) {
+        elements.addFolderBtn.addEventListener('click', () => {
+            elements.folderModal?.classList.add('visible')
+        })
+    }
     
-    elements.folderForm.addEventListener('submit', createFolder)
+    if (elements.folderForm) {
+        elements.folderForm.addEventListener('submit', createFolder)
+    }
     
     // Icon picker
     elements.iconPicker.querySelectorAll('.icon-option').forEach(btn => {
@@ -800,7 +843,9 @@ function setupEventListeners() {
     })
     
     // Edit form
-    elements.editForm.addEventListener('submit', updateLink)
+    if (elements.editForm) {
+        elements.editForm.addEventListener('submit', updateLink)
+    }
     
     // Modal close buttons
     document.querySelectorAll('[data-close-modal]').forEach(btn => {
@@ -827,8 +872,17 @@ function setupEventListeners() {
         // Ctrl+K to focus search
         if (e.ctrlKey && e.key === 'k') {
             e.preventDefault()
-            elements.searchInput.focus()
+            elements.searchInput?.focus()
         }
     })
 }
 
+// ============================================
+// Initialize App
+// ============================================
+// Run when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startAuthListener)
+} else {
+    startAuthListener()
+}

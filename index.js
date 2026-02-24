@@ -9,21 +9,36 @@ import { getAuth,
 import { firebaseConfig } from './firebase_config.js'
 
 // ============================================
-// DOM Elements
+// DOM Elements - Initialize after DOM ready
 // ============================================
-const elements = {
-  form: document.getElementById('login-form'),
-  signUp: document.getElementById('sign-up-btn'),
-  loginBtn: document.getElementById('btn'),
-  googleLog: document.getElementById('login-google'),
-  userName: document.getElementById('userName'),
-  password: document.getElementById('password'),
-  togglePassword: document.getElementById('toggle-password'),
-  themeToggle: document.getElementById('theme-toggle'),
-  toastContainer: document.getElementById('toast-container'),
-  emailError: document.getElementById('email-error'),
-  passwordError: document.getElementById('password-error'),
-  forgotPassword: document.getElementById('forgot-password')
+let elements = {}
+
+function initElements() {
+  elements = {
+    form: document.getElementById('login-form'),
+    signUp: document.getElementById('sign-up-btn'),
+    loginBtn: document.getElementById('btn'),
+    googleLog: document.getElementById('login-google'),
+    userName: document.getElementById('userName'),
+    password: document.getElementById('password'),
+    togglePassword: document.getElementById('toggle-password'),
+    themeToggle: document.getElementById('theme-toggle'),
+    toastContainer: document.getElementById('toast-container'),
+    emailError: document.getElementById('email-error'),
+    passwordError: document.getElementById('password-error'),
+    forgotPassword: document.getElementById('forgot-password')
+  }
+  
+  // Debug: Check if elements are found
+  console.log('DOM Elements initialized:', {
+    form: !!elements.form,
+    signUp: !!elements.signUp,
+    loginBtn: !!elements.loginBtn,
+    googleLog: !!elements.googleLog,
+    userName: !!elements.userName,
+    password: !!elements.password,
+    themeToggle: !!elements.themeToggle
+  })
 }
 
 // Firebase Initialization
@@ -79,8 +94,11 @@ function toggleTheme() {
 }
 
 function updateThemeIcon(theme) {
+  if (!elements.themeToggle) return
   const icon = elements.themeToggle.querySelector('.theme-icon')
-  icon.textContent = theme === 'dark' ? '☀️' : '🌙'
+  if (icon) {
+    icon.textContent = theme === 'dark' ? '☀️' : '🌙'
+  }
 }
 
 
@@ -307,6 +325,8 @@ function handleForgotPassword(e) {
 // Real-time Validation
 
 function setupRealtimeValidation() {
+  if (!elements.userName || !elements.password) return
+  
   elements.userName.addEventListener('blur', () => {
     const email = elements.userName.value.trim()
     if (email && !validateEmail(email)) {
@@ -339,6 +359,8 @@ function setupRealtimeValidation() {
 // Keyboard Accessibility
 
 function setupKeyboardNav() {
+  if (!elements.password) return
+  
   // Enter key on inputs submits form
   elements.password.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
@@ -353,14 +375,26 @@ function setupKeyboardNav() {
 // ============================================
 function setupEventListeners() {
   // Form submission
-  elements.form.addEventListener('submit', handleEmailLogin)
-  elements.signUp.addEventListener('click', handleSignUp)
-  elements.googleLog.addEventListener('click', handleGoogleLogin)
+  if (elements.form) {
+    elements.form.addEventListener('submit', handleEmailLogin)
+  }
+  if (elements.signUp) {
+    elements.signUp.addEventListener('click', handleSignUp)
+  }
+  if (elements.googleLog) {
+    elements.googleLog.addEventListener('click', handleGoogleLogin)
+  }
   
   // UI interactions
-  elements.togglePassword.addEventListener('click', togglePasswordVisibility)
-  elements.themeToggle.addEventListener('click', toggleTheme)
-  elements.forgotPassword.addEventListener('click', handleForgotPassword)
+  if (elements.togglePassword) {
+    elements.togglePassword.addEventListener('click', togglePasswordVisibility)
+  }
+  if (elements.themeToggle) {
+    elements.themeToggle.addEventListener('click', toggleTheme)
+  }
+  if (elements.forgotPassword) {
+    elements.forgotPassword.addEventListener('click', handleForgotPassword)
+  }
   
   // Setup validation and keyboard nav
   setupRealtimeValidation()
@@ -371,11 +405,23 @@ function setupEventListeners() {
 // Initialize App
 // ============================================
 function init() {
+  console.log('Initializing app...')
+  
+  // Initialize DOM elements first
+  initElements()
+  
+  // Initialize theme
   initTheme()
+  
+  // Setup event listeners
   setupEventListeners()
   
   // Focus on email field for quick start
-  elements.userName.focus()
+  if (elements.userName) {
+    elements.userName.focus()
+  }
+  
+  console.log('App initialized successfully')
 }
 
 // Run when DOM is ready

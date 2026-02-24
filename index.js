@@ -27,21 +27,33 @@ const elements = {
 }
 
 // Firebase Initialization
+let app, auth, provider
 
-const provider = new GoogleAuthProvider()
-const app = initializeApp(firebaseConfig)
-const auth = getAuth(app)
-
-// ============================================
-// Auth State Guard - Redirect if already logged in
-// ============================================
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // User is already logged in, redirect to dashboard
-    console.log("User already authenticated:", user.email)
-    window.location.replace("logged.html")
+try {
+  // Check if Firebase config is properly loaded
+  if (!firebaseConfig.apiKey || firebaseConfig.apiKey === 'undefined') {
+    console.error('Firebase config is missing. Check environment variables.')
+    throw new Error('Firebase configuration not found')
   }
-})
+  
+  provider = new GoogleAuthProvider()
+  app = initializeApp(firebaseConfig)
+  auth = getAuth(app)
+  console.log('Firebase initialized successfully')
+} catch (error) {
+  console.error('Firebase initialization error:', error)
+}
+
+// Auth State Guard - Redirect if already logged in
+if (auth) {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // User is already logged in, redirect to dashboard
+      console.log("User already authenticated:", user.email)
+      window.location.replace("logged.html")
+    }
+  })
+}
 
 // Theme Management
 function initTheme() {
@@ -163,9 +175,9 @@ function setButtonLoading(button, isLoading) {
   }
 }
 
-// ============================================
+
 // Authentication Handlers
-// ============================================
+
 async function handleSignUp(e) {
   e.preventDefault()
   
@@ -272,9 +284,9 @@ async function handleGoogleLogin() {
   }
 }
 
-// ============================================
+
 // Password Visibility Toggle
-// ============================================
+
 function togglePasswordVisibility() {
   const type = elements.password.type === 'password' ? 'text' : 'password'
   elements.password.type = type
@@ -283,17 +295,17 @@ function togglePasswordVisibility() {
     type === 'password' ? 'Show password' : 'Hide password')
 }
 
-// ============================================
+
 // Forgot Password Handler
-// ============================================
+
 function handleForgotPassword(e) {
   e.preventDefault()
   showToast('Password reset feature coming soon!', 'info')
 }
 
-// ============================================
+
 // Real-time Validation
-// ============================================
+
 function setupRealtimeValidation() {
   elements.userName.addEventListener('blur', () => {
     const email = elements.userName.value.trim()
@@ -323,9 +335,9 @@ function setupRealtimeValidation() {
   })
 }
 
-// ============================================
+
 // Keyboard Accessibility
-// ============================================
+
 function setupKeyboardNav() {
   // Enter key on inputs submits form
   elements.password.addEventListener('keypress', (e) => {

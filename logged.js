@@ -7,9 +7,22 @@ import { firebaseConfig } from './firebase_config.js'
 // ============================================
 // Firebase Initialization
 // ============================================
-const app = initializeApp(firebaseConfig)
-const auth = getAuth(app)
-const database = getDatabase(app)
+let app, auth, database
+
+try {
+    // Check if Firebase config is properly loaded
+    if (!firebaseConfig.apiKey || firebaseConfig.apiKey === 'undefined') {
+        console.error('Firebase config is missing. Check environment variables.')
+        throw new Error('Firebase configuration not found')
+    }
+    
+    app = initializeApp(firebaseConfig)
+    auth = getAuth(app)
+    database = getDatabase(app)
+    console.log('Firebase initialized successfully')
+} catch (error) {
+    console.error('Firebase initialization error:', error)
+}
 
 // ============================================
 // State Management
@@ -92,17 +105,21 @@ const elements = {
 // ============================================
 // Authentication
 // ============================================
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        console.log("No user logged in, redirecting to login page")
-        window.location.replace("index.html")
-        return
-    }
-    
-    currentUser = user
-    console.log("User is logged in:", user.email)
-    initializeAppUI(user)
-})
+if (auth) {
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            console.log("No user logged in, redirecting to login page")
+            window.location.replace("index.html")
+            return
+        }
+        
+        currentUser = user
+        console.log("User is logged in:", user.email)
+        initializeAppUI(user)
+    })
+} else {
+    console.error('Auth not initialized, cannot check user state')
+}
 
 function initializeAppUI(user) {
     // Update user info
